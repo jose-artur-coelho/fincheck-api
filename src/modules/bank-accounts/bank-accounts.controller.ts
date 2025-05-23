@@ -29,15 +29,15 @@ export class BankAccountsController {
   }
 
   @Get('/:id')
-  retrieve(@Req() req: Request, @Param('id') id: string) {
+  find(@Req() req: Request, @Param('id') id: string) {
     const userId = getRequestUser(req);
-    return this.bankAccountsService.retrieve(id, userId);
+    return this.bankAccountsService.find(id, userId);
   }
 
   @Get()
-  retriveAll(@Req() req: Request) {
+  findAll(@Req() req: Request) {
     const userId = getRequestUser(req);
-    return this.bankAccountsService.retrieveAll(userId);
+    return this.bankAccountsService.findAll(userId);
   }
 
   @Put('/:id')

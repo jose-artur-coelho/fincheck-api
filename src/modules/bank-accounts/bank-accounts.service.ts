@@ -30,12 +30,12 @@ export class BankAccountsService {
     return createdAccount;
   }
 
-  async retrieve(id: string, userId: string) {
+  async find(id: string, userId: string) {
     const account = await this.checkAccount(id, userId);
     return account;
   }
 
-  async retrieveAll(userId: string) {
+  async findAll(userId: string) {
     const accounts = await this.bankAccountsRepository.findAllByUser(userId);
     return accounts;
   }
