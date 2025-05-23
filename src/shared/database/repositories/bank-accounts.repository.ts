@@ -16,12 +16,6 @@ export class BankAccountsRepository {
           },
         },
       },
-      select: {
-        id: true,
-        name: true,
-        type: true,
-        userId: true,
-      },
     });
     return createdAccount;
   }
@@ -53,14 +47,6 @@ export class BankAccountsRepository {
       where: {
         id,
       },
-      select: {
-        id: true,
-        name: true,
-        balance: true,
-        type: true,
-        color: true,
-        userId: true,
-      },
     });
     return account;
   }
@@ -68,27 +54,25 @@ export class BankAccountsRepository {
   async findAllByUser(userId: string) {
     const accounts = await this.prisma.bankAccount.findMany({
       where: { userId },
-      select: {
-        id: true,
-        name: true,
-        balance: true,
-        type: true,
-        color: true,
-        userId: true,
-      },
     });
 
     return accounts;
   }
 
-  async delete(id: string) {
+  async deleteById(id: string) {
     await this.prisma.bankAccount.delete({
       where: {
         id,
       },
-      select: {
-        id: true,
-      },
     });
+  }
+  async canWithdraw(id: string, value: number) {
+    const account = await this.findById(id);
+
+    if (!account || account.balance < value) {
+      return false;
+    }
+
+    return true;
   }
 }

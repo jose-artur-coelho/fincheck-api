@@ -48,7 +48,7 @@ export class BankAccountsService {
 
   async delete(id: string, userId: string) {
     await this.checkAccount(id, userId);
-    return this.bankAccountsRepository.delete(id);
+    return this.bankAccountsRepository.deleteById(id);
   }
 
   private async checkAccount(id: string, userId: string) {

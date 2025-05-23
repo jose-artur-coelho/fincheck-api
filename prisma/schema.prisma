@@ -14,7 +14,7 @@ generator client {
 }
 
 model User {
-  id           String        @id @default(ulid())
+  id           String        @id @default(uuid())
   name         String
   email        String        @unique
   password     String
@@ -24,7 +24,7 @@ model User {
 }
 
 model BankAccount {
-  id           String          @id @default(ulid())
+  id           String          @id @default(uuid())
   name         String
   balance      Float
   color        String
@@ -35,9 +35,10 @@ model BankAccount {
 }
 
 model Transaction {
-  id            String          @id @default(ulid())
+  id            String          @id @default(uuid())
   name          String
   value         Float
+  date          DateTime
   type          TransactionType
   User          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId        String
@@ -48,13 +49,13 @@ model Transaction {
 }
 
 model Category {
-  id           String          @id @default(ulid())
+  id           String          @id @default(uuid())
   name         String
   icon         String
   type         TransactionType
   transactions Transaction[]
-  User         User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       String?
+  User         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
 }
 
 enum BankAccountType {

@@ -41,4 +41,23 @@ export class UsersRepository {
     });
     return user;
   }
+
+  async ownsBankAccountByIdAndCategoryById(
+    userId: string,
+    bankAccountId: string,
+    categoryId: string,
+  ) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+        bankAccounts: {
+          some: { id: bankAccountId },
+        },
+        categories: {
+          some: { id: categoryId },
+        },
+      },
+    });
+    return Boolean(user);
+  }
 }
