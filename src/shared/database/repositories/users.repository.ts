@@ -42,6 +42,39 @@ export class UsersRepository {
     return user;
   }
 
+  async update(id: string, data: Prisma.UserUpdateInput) {
+    let newPassword: undefined | string = undefined;
+
+    if (typeof data?.password === 'string') {
+      newPassword = await hash(data.password, 6);
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id },
+      data: { ...data, password: newPassword },
+    });
+
+    return updatedUser;
+  }
+
+  async deleteById(id: string) {
+    await this.prisma.user.delete({ where: { id } });
+  }
+
+  async getAllDataById(id: string) {
+    const userData = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        email: true,
+        name: true,
+        categories: true,
+        bankAccounts: true,
+        transactions: true,
+      },
+    });
+    return userData;
+  }
+
   async ownsBankAccountByIdAndCategoryById(
     userId: string,
     bankAccountId: string,
