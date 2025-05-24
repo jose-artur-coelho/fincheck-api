@@ -100,6 +100,24 @@ export class TransactionsRepository {
         value: true,
       },
     });
+
+    if (transactionToDelete.type === 'INCOME') {
+      const transactionAccount = await this.prisma.bankAccount.findUnique({
+        where: {
+          id: transactionToDelete.bankAccountId,
+        },
+        select: {
+          balance: true,
+        },
+      });
+      if (
+        transactionAccount?.balance &&
+        transactionAccount.balance < transactionToDelete.value
+      ) {
+        return;
+      }
+    }
+
     await this.prisma.bankAccount.update({
       where: {
         id: transactionToDelete.bankAccountId,
@@ -119,6 +137,29 @@ export class TransactionsRepository {
     type: TransactionType,
     value: number,
   ) {
+    if (type === 'EXPENSE') {
+      const newAccount = await this.prisma.bankAccount.findUnique({
+        where: {
+          id: newAccountId,
+        },
+        select: {
+          balance: true,
+        },
+      });
+
+      if (newAccount?.balance && newAccount.balance < value) {
+        await this.prisma.bankAccount.update({
+          where: {
+            id: oldAccountid,
+          },
+          data: {
+            balance: { increment: value },
+          },
+        });
+        return;
+      }
+    }
+
     await this.prisma.bankAccount.update({
       where: {
         id: oldAccountid,
