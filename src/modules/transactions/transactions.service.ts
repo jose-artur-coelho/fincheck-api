@@ -52,12 +52,12 @@ export class TransactionsService {
     return createdTransaction;
   }
 
-  async retrieve(id: string, userId: string) {
+  async find(id: string, userId: string) {
     const transaction = await this.checkTransaction(id, userId);
     return transaction;
   }
 
-  async retrieveAll(userId: string) {
+  async findAll(userId: string) {
     const accounts = await this.transactionsRepository.findAllByUserId(userId);
     return accounts;
   }
