@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { env } from './shared/config/env';
 import { BankAccountsModule } from './modules/bank-accounts/bank-accounts.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { TransactionsModule } from './modules/transactions/transactions.module';
     DatabaseModule,
     BankAccountsModule,
     TransactionsModule,
+    CategoriesModule,
   ],
   controllers: [],
   providers: [],
