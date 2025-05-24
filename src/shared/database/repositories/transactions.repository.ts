@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, TransactionType } from '@prisma/client';
 
 @Injectable()
 export class TransactionsRepository {
@@ -48,10 +48,94 @@ export class TransactionsRepository {
     return transactions;
   }
 
-  async deleteById(id: string) {
-    await this.prisma.transaction.delete({
+  async update(
+    id: string,
+    data: Prisma.TransactionUncheckedUpdateWithoutUserInput,
+  ) {
+    const beforeUpdateTransaction = await this.prisma.transaction.findUnique({
+      where: { id },
+      select: {
+        bankAccountId: true,
+      },
+    });
+
+    const updatedTransaction = await this.prisma.transaction.update({
       where: {
         id,
+      },
+      data: {
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.date !== undefined && { date: data.date }),
+        ...(data.bankAccountId !== undefined && {
+          bankAccountId: data.bankAccountId,
+        }),
+        ...(data.categoryId !== undefined && {
+          categoryId: data.categoryId,
+        }),
+      },
+    });
+
+    if (
+      beforeUpdateTransaction?.bankAccountId &&
+      beforeUpdateTransaction.bankAccountId !== updatedTransaction.bankAccountId
+    ) {
+      await this.swapBalance(
+        beforeUpdateTransaction.bankAccountId,
+        updatedTransaction.bankAccountId,
+        updatedTransaction.type,
+        updatedTransaction.value,
+      );
+    }
+    return updatedTransaction;
+  }
+
+  async deleteById(id: string) {
+    const transactionToDelete = await this.prisma.transaction.delete({
+      where: {
+        id,
+      },
+      select: {
+        bankAccountId: true,
+        type: true,
+        value: true,
+      },
+    });
+    await this.prisma.bankAccount.update({
+      where: {
+        id: transactionToDelete.bankAccountId,
+      },
+      data: {
+        balance:
+          transactionToDelete.type === 'INCOME'
+            ? { decrement: transactionToDelete.value }
+            : { increment: transactionToDelete.value },
+      },
+    });
+  }
+
+  private async swapBalance(
+    oldAccountid: string,
+    newAccountId: string,
+    type: TransactionType,
+    value: number,
+  ) {
+    await this.prisma.bankAccount.update({
+      where: {
+        id: oldAccountid,
+      },
+      data: {
+        balance:
+          type === 'INCOME' ? { decrement: value } : { increment: value },
+      },
+    });
+
+    await this.prisma.bankAccount.update({
+      where: {
+        id: newAccountId,
+      },
+      data: {
+        balance:
+          type === 'INCOME' ? { increment: value } : { decrement: value },
       },
     });
   }

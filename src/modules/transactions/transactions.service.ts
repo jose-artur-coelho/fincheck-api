@@ -9,6 +9,7 @@ import { CreateTransactionDTO } from './dto/create-transaction.dto';
 import { TransactionType } from 'src/shared/types/transaction-type.dto';
 import { BankAccountsRepository } from 'src/shared/database/repositories/bank-accounts.repository';
 import { UsersRepository } from 'src/shared/database/repositories/users.repository';
+import { UpdateTransactionDTO } from './dto/update-transaction.dto';
 
 @Injectable()
 export class TransactionsService {
@@ -60,6 +61,27 @@ export class TransactionsService {
   async findAll(userId: string) {
     const accounts = await this.transactionsRepository.findAllByUserId(userId);
     return accounts;
+  }
+
+  async update(id: string, dto: UpdateTransactionDTO, userId: string) {
+    await this.checkTransaction(id, userId);
+    const canUpdate =
+      await this.usersRepository.ownsBankAccountByIdAndCategoryById(
+        userId,
+        dto.bankAccountId,
+        dto.categoryId,
+      );
+    if (!canUpdate) {
+      throw new NotFoundException(
+        'Bank account or category not found or not owned by user',
+      );
+    }
+    const updatedTransaction = await this.transactionsRepository.update(
+      id,
+      dto,
+    );
+
+    return updatedTransaction;
   }
 
   async delete(id: string, userId: string) {

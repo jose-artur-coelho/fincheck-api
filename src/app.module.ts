@@ -6,6 +6,7 @@ import { DatabaseModule } from './shared/database/database.module';
 import { JwtModule } from '@nestjs/jwt';
 import { env } from './shared/config/env';
 import { BankAccountsModule } from './modules/bank-accounts/bank-accounts.module';
+import { TransactionsModule } from './modules/transactions/transactions.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { BankAccountsModule } from './modules/bank-accounts/bank-accounts.module
     UsersModule,
     DatabaseModule,
     BankAccountsModule,
+    TransactionsModule,
   ],
   controllers: [],
   providers: [],

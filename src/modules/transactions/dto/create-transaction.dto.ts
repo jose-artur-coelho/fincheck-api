@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsDate,
   IsEnum,
@@ -20,6 +21,7 @@ export class CreateTransactionDTO {
   @IsEnum(TransactionType)
   type: TransactionType;
 
+  @Type(() => Date)
   @IsDate()
   @IsNotEmpty()
   date: Date;
