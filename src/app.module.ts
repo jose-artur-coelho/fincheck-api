@@ -15,7 +15,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
     JwtModule.register({
       global: true,
       secret: env.jwtSecret,
-      signOptions: { expiresIn: '5m' },
+      signOptions: { expiresIn: '10d' },
     }),
     AuthModule,
     UsersModule,
